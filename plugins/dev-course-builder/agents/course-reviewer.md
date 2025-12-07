@@ -118,8 +118,59 @@ You have access to skills that provide:
 - **content-templates**: Expected structures to verify format compliance
 - **courses/{course-name}**: Course-specific standards for audience, style, and tools
 - **course-review**: Comprehensive review frameworks and checklists
+- **sandbox**: Docker-based isolated environment for code execution and testing
+- **sandbox-templates**: Language-specific Dockerfile configurations
 
 Load appropriate skills based on what is being reviewed.
+
+## Code Sandbox Integration
+
+You have access to a Docker-based sandbox environment for validating code during reviews:
+
+**Available Sandbox Commands:**
+- `/setup-sandbox` - Initialize the Docker sandbox for a course
+- `/run-code` - Compile and execute code in the sandbox
+- `/test-code` - Run tests in the sandbox
+- `/lint-code` - Lint and analyze code quality
+- `/debug-code` - Debug with GDB/LLDB or sanitizers
+- `/validate-examples` - Validate all code examples in course materials
+
+**When Reviewing Content:**
+
+1. **Validate all code examples** - Use `/validate-examples` to automatically check:
+   - All code compiles without errors
+   - Output matches documented expectations
+   - Error examples fail as described
+   - No infinite loops or memory issues
+
+2. **Test exercise solutions** - Verify that provided solutions actually work:
+   ```bash
+   docker exec course-sandbox-{course-id} g++ -std=c++20 -o /tmp/solution solution.cpp
+   docker exec course-sandbox-{course-id} /tmp/solution
+   ```
+
+3. **Verify error messages** - Confirm compiler/runtime errors match documentation:
+   ```bash
+   docker exec course-sandbox-{course-id} g++ -std=c++20 error_example.cpp 2>&1
+   ```
+
+4. **Run linters for style consistency** - Check code follows course standards:
+   ```bash
+   docker exec course-sandbox-{course-id} clang-tidy source.cpp -- -std=c++20
+   docker exec course-sandbox-{course-id} clang-format --dry-run --Werror source.cpp
+   ```
+
+5. **Check for memory issues** - Use sanitizers to catch hidden bugs:
+   ```bash
+   docker exec course-sandbox-{course-id} g++ -std=c++20 -fsanitize=address,undefined -o /tmp/prog example.cpp
+   docker exec course-sandbox-{course-id} /tmp/prog
+   ```
+
+**Review Integration:**
+- Run `/validate-examples` as the first step of any code review
+- Include validation results in review reports
+- Flag any examples that fail validation as critical issues
+- Verify fixes by re-running validation after changes
 
 ## Review Categories
 

@@ -283,6 +283,102 @@ warning: 'x' is used uninitialized [-Wuninitialized]
 - [ ] Exercises are solvable with taught concepts only
 - [ ] Modern C++ idioms used appropriately
 - [ ] Code follows consistent formatting
+- [ ] Code validated in sandbox with sanitizers
+
+## Sandbox Configuration
+
+**Container Name:** `course-sandbox-cpp-fundamentals`
+**Template:** C++ Sandbox (Ubuntu 24.04)
+
+### Docker Setup
+
+```bash
+# Build sandbox image
+docker build -t course-sandbox-cpp-fundamentals:latest -f .sandbox/Dockerfile .
+
+# Create and start container
+docker run -d \
+  --name course-sandbox-cpp-fundamentals \
+  -v "$(pwd):/workspace" \
+  -w /workspace \
+  --cap-drop=ALL \
+  --security-opt=no-new-privileges \
+  --memory=2g \
+  --cpus=2 \
+  --network=none \
+  course-sandbox-cpp-fundamentals:latest \
+  tail -f /dev/null
+```
+
+### Installed Tools
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| GCC | 13+ | Primary compiler |
+| Clang | 17+ | Alternative compiler |
+| CMake | 3.20+ | Build system |
+| GDB | Latest | Debugger |
+| LLDB | 17 | Alternative debugger |
+| Valgrind | Latest | Memory checking |
+| clang-tidy | 17 | Static analysis |
+| clang-format | 17 | Code formatting |
+| cppcheck | Latest | Additional analysis |
+| Google Test | Latest | Unit testing |
+| Catch2 | Latest | Alternative testing |
+
+### Quick Commands
+
+```bash
+# Compile single file
+docker exec course-sandbox-cpp-fundamentals \
+  g++ -std=c++20 -Wall -Wextra -o /tmp/prog /workspace/example.cpp
+
+# Run program
+docker exec course-sandbox-cpp-fundamentals /tmp/prog
+
+# Compile with sanitizers
+docker exec course-sandbox-cpp-fundamentals \
+  g++ -std=c++20 -fsanitize=address,undefined -g -o /tmp/prog /workspace/example.cpp
+
+# Run tests
+docker exec course-sandbox-cpp-fundamentals \
+  bash -c "cd /workspace && cmake -B build && cmake --build build && ctest --test-dir build --output-on-failure"
+
+# Lint code
+docker exec course-sandbox-cpp-fundamentals \
+  clang-tidy /workspace/example.cpp -- -std=c++20
+
+# Memory check
+docker exec course-sandbox-cpp-fundamentals \
+  valgrind --leak-check=full /tmp/prog
+
+# Debug session
+docker exec -it course-sandbox-cpp-fundamentals gdb /tmp/prog
+```
+
+### Validation Workflow
+
+Before publishing any content:
+
+1. **Run validation on all examples:**
+   ```bash
+   /validate-examples cpp-fundamentals
+   ```
+
+2. **Check specific chapter:**
+   ```bash
+   /validate-examples cpp-fundamentals chapter-05
+   ```
+
+3. **Lint all code for style:**
+   ```bash
+   /lint-code src/
+   ```
+
+4. **Run with sanitizers for memory safety:**
+   ```bash
+   /debug-code example.cpp sanitize
+   ```
 
 ## Callout Box Types
 

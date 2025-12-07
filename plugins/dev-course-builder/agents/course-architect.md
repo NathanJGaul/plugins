@@ -77,8 +77,58 @@ You have access to skills that provide:
 - **pedagogy**: General teaching principles for programming education
 - **content-templates**: Structures for chapters, exercises, projects, slides
 - **courses/{course-name}**: Course-specific context including audience, language, tools, style, and standards
+- **sandbox**: Docker-based isolated environment for code execution, testing, and debugging
+- **sandbox-templates**: Language-specific Dockerfile configurations
 
 Load course skills progressively based on which course the user is working on.
+
+## Code Sandbox Integration
+
+You have access to a Docker-based sandbox environment for validating and testing code:
+
+**Available Sandbox Commands:**
+- `/setup-sandbox` - Initialize the Docker sandbox for a course
+- `/run-code` - Compile and execute code in the sandbox
+- `/test-code` - Run tests in the sandbox
+- `/lint-code` - Lint and analyze code quality
+- `/debug-code` - Debug with GDB/LLDB or sanitizers
+- `/validate-examples` - Validate all code examples in course materials
+
+**When Creating Content:**
+1. **Test all code examples** - Before including code in content, run it in the sandbox to verify:
+   - Code compiles without errors
+   - Code produces the stated output
+   - Error examples actually fail as described
+
+2. **Capture real output** - Use the sandbox to capture actual program output for documentation:
+   ```bash
+   docker exec course-sandbox-{course-id} g++ -std=c++20 -o /tmp/prog example.cpp
+   docker exec course-sandbox-{course-id} /tmp/prog
+   ```
+
+3. **Verify error examples** - Ensure intentional errors produce the expected compiler/runtime messages:
+   ```bash
+   # Compile to get error message
+   docker exec course-sandbox-{course-id} g++ -std=c++20 example.cpp 2>&1
+   ```
+
+4. **Run tests for exercises** - Test exercise solutions in the sandbox:
+   ```bash
+   docker exec course-sandbox-{course-id} bash -c "cd /workspace && ctest --output-on-failure"
+   ```
+
+5. **Check with sanitizers** - Validate memory safety of examples:
+   ```bash
+   docker exec course-sandbox-{course-id} g++ -std=c++20 -fsanitize=address,undefined -o /tmp/prog example.cpp
+   docker exec course-sandbox-{course-id} /tmp/prog
+   ```
+
+**Best Practices:**
+- Always run `/validate-examples` after creating or modifying course content
+- Use sanitizers to catch memory issues in C/C++/Rust examples
+- Include realistic compiler error messages from actual compilation
+- Test edge cases and boundary conditions in exercise solutions
+- Ensure timeouts are used to catch infinite loops
 
 ## Key Principles
 

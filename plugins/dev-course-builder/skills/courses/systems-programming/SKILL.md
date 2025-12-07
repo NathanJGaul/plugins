@@ -95,3 +95,79 @@ Systems programming courses should typically:
 - Specify complexity requirements
 - Test with large inputs
 - Compare against reference implementation
+
+## Sandbox Configuration
+
+Systems programming courses require robust sandbox environments with full debugging and memory analysis tooling.
+
+### Required Container Capabilities
+
+All systems programming sandboxes must include:
+
+| Category | Tools | Purpose |
+|----------|-------|---------|
+| Compilers | GCC 13+, Clang 17+ | Compilation with latest standards |
+| Debuggers | GDB, LLDB | Interactive debugging |
+| Memory Analysis | Valgrind, ASan, MSan, UBSan | Memory error detection |
+| Thread Analysis | ThreadSanitizer, Helgrind | Race condition detection |
+| Static Analysis | clang-tidy, cppcheck | Code quality checks |
+| Profiling | perf, flamegraph | Performance analysis |
+
+### Sandbox Commands
+
+```bash
+# Initialize sandbox
+/setup-sandbox {course-id}
+
+# Compile and run with full warnings
+/run-code source.cpp
+
+# Run with memory sanitizers
+/debug-code source.cpp sanitize
+
+# Memory leak check
+docker exec course-sandbox-{course-id} \
+  valgrind --leak-check=full --show-leak-kinds=all /tmp/prog
+
+# Thread safety check
+docker exec course-sandbox-{course-id} \
+  g++ -std=c++20 -fsanitize=thread -g -o /tmp/prog source.cpp && /tmp/prog
+
+# Performance profiling
+docker exec course-sandbox-{course-id} \
+  perf record /tmp/prog && perf report
+```
+
+### Validation Requirements
+
+Before publishing content:
+
+1. **All code must compile** - Zero tolerance for compile errors
+2. **All code must pass sanitizers** - ASan, UBSan, and TSan (for threaded code)
+3. **Memory must be clean** - Valgrind should report no leaks for completed examples
+4. **Error examples must fail** - Verify intentional errors produce expected failures
+
+### Security Constraints
+
+Systems programming sandboxes need special security consideration:
+
+```bash
+docker run -d \
+  --name course-sandbox-{course-id} \
+  --cap-drop=ALL \
+  --security-opt=no-new-privileges \
+  --security-opt=seccomp=default \
+  --memory=2g \
+  --cpus=2 \
+  --network=none \
+  --read-only \
+  --tmpfs /tmp:size=512m \
+  course-sandbox-{course-id}:latest
+```
+
+Key restrictions:
+- **No network access** - Prevents exfiltration
+- **Read-only filesystem** - Prevents persistent changes
+- **Dropped capabilities** - Minimal privileges
+- **Resource limits** - Prevents resource exhaustion
+- **Seccomp filtering** - Restricts system calls

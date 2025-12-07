@@ -21,6 +21,8 @@ Copy to your project's `.claude-plugin/` directory.
 
 ## Commands
 
+### Content Creation
+
 | Command | Description | Example |
 |---------|-------------|---------|
 | `/create-course-profile` | Create a new course profile | `/create-course-profile rust-fundamentals` |
@@ -30,7 +32,27 @@ Copy to your project's `.claude-plugin/` directory.
 | `/create-project` | Multi-session project | `/create-project cpp-fundamentals capstone` |
 | `/create-lab` | Hands-on lab session | `/create-lab cpp-fundamentals chapters 5-6` |
 | `/create-slides` | Lecture slides | `/create-slides cpp-fundamentals memory-management` |
+
+### Content Review
+
+| Command | Description | Example |
+|---------|-------------|---------|
 | `/review-content` | Review existing content | `/review-content ./chapters/ch03.md` |
+| `/review-course` | Full course review | `/review-course cpp-fundamentals` |
+| `/review-structure` | Analyze course structure | `/review-structure cpp-fundamentals` |
+| `/review-code-examples` | Audit code examples | `/review-code-examples cpp-fundamentals chapter-5` |
+| `/suggest-improvements` | Generate improvements | `/suggest-improvements cpp-fundamentals engagement` |
+
+### Sandbox & Code Execution
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/setup-sandbox` | Initialize Docker sandbox | `/setup-sandbox cpp-fundamentals` |
+| `/run-code` | Compile and execute code | `/run-code example.cpp` |
+| `/test-code` | Run tests in sandbox | `/test-code tests/` |
+| `/lint-code` | Lint and analyze code | `/lint-code src/ --fix` |
+| `/debug-code` | Debug with GDB/sanitizers | `/debug-code main.cpp gdb` |
+| `/validate-examples` | Validate all code examples | `/validate-examples cpp-fundamentals` |
 
 ## Course Profiles
 
@@ -69,12 +91,71 @@ The plugin provides specialized knowledge through skills:
 |-------|---------|
 | `pedagogy` | Teaching principles for code-first learning |
 | `content-templates` | Structural templates for all content types |
+| `course-review` | Review frameworks and quality checklists |
+| `sandbox` | Docker-based code execution infrastructure |
+| `sandbox-templates` | Language-specific Dockerfile templates |
 | `courses/cpp-fundamentals` | C++ course configuration |
 | `courses/systems-programming` | Systems programming base profile |
 
-## Agent
+## Agents
 
-The **course-architect** agent handles content generation. It's automatically invoked when you use the commands, or you can interact with it directly for custom requests.
+| Agent | Purpose |
+|-------|---------|
+| `course-architect` | Content creation - chapters, exercises, labs, quizzes, slides, projects |
+| `course-reviewer` | Content review - code correctness, pedagogy, consistency, quality |
+
+Both agents integrate with the Docker sandbox for code validation.
+
+## Code Sandbox
+
+The plugin includes a Docker-based sandbox system for safely executing, testing, linting, and debugging code examples.
+
+### Features
+
+- **Isolated Execution**: All code runs in Docker containers
+- **Persistent Environment**: One container per course, maintains state
+- **Language Support**: C++, Rust, Python, Go, C, and multi-language
+- **Full Toolchain**: Compilers, linters, debuggers, and test frameworks
+- **Security**: Dropped capabilities, no network, resource limits
+
+### Quick Start
+
+```bash
+# 1. Set up sandbox for a course
+/setup-sandbox cpp-fundamentals
+
+# 2. Run code in sandbox
+/run-code examples/hello.cpp
+
+# 3. Run tests
+/test-code tests/
+
+# 4. Validate all course examples
+/validate-examples cpp-fundamentals
+```
+
+### Sandbox Templates
+
+Pre-configured environments available:
+
+| Template | Languages | Tools |
+|----------|-----------|-------|
+| C++ Sandbox | C++17/20/23 | GCC 13, Clang 17, CMake, GDB, Valgrind, clang-tidy |
+| Rust Sandbox | Rust stable/nightly | cargo, clippy, rustfmt, miri |
+| Python Sandbox | Python 3.12 | pytest, mypy, ruff, black |
+| Go Sandbox | Go 1.23+ | go test, staticcheck, delve |
+| C Sandbox | C11/17/23 | GCC 13, Clang 17, GDB, Valgrind |
+| Multi-language | All above | Full toolchains for each |
+
+### Validation Workflow
+
+Before publishing course content:
+
+1. **Set up sandbox**: `/setup-sandbox course-name`
+2. **Validate all examples**: `/validate-examples course-name`
+3. **Review failures**: Fix any compile/runtime/output issues
+4. **Lint for consistency**: `/lint-code src/`
+5. **Check memory safety**: `/debug-code example.cpp sanitize`
 
 ## Content Structure
 
@@ -118,7 +199,8 @@ dev-course-builder/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── agents/
-│   └── course-architect.md
+│   ├── course-architect.md      # Content creation agent
+│   └── course-reviewer.md       # Quality review agent
 ├── commands/
 │   ├── create-course-profile.md
 │   ├── create-exercise.md
@@ -126,17 +208,33 @@ dev-course-builder/
 │   ├── create-project.md
 │   ├── create-quiz.md
 │   ├── create-slides.md
+│   ├── write-chapter.md
 │   ├── review-content.md
-│   └── write-chapter.md
+│   ├── review-course.md
+│   ├── review-structure.md
+│   ├── review-code-examples.md
+│   ├── suggest-improvements.md
+│   ├── setup-sandbox.md         # Sandbox commands
+│   ├── run-code.md
+│   ├── test-code.md
+│   ├── lint-code.md
+│   ├── debug-code.md
+│   └── validate-examples.md
 ├── skills/
 │   ├── content-templates/
+│   │   └── SKILL.md
+│   ├── course-review/
 │   │   └── SKILL.md
 │   ├── courses/
 │   │   ├── cpp-fundamentals/
 │   │   │   └── SKILL.md
 │   │   └── systems-programming/
 │   │       └── SKILL.md
-│   └── pedagogy/
+│   ├── pedagogy/
+│   │   └── SKILL.md
+│   ├── sandbox/                  # Sandbox skills
+│   │   └── SKILL.md
+│   └── sandbox-templates/
 │       └── SKILL.md
 └── README.md
 ```
