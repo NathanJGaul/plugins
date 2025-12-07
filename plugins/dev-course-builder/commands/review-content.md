@@ -101,7 +101,7 @@ The agent will analyze the content and provide detailed feedback.
 
 ## What the Agent Does
 
-The course-architect agent will:
+The course-reviewer agent will:
 
 **Analysis:**
 - Read and analyze the content thoroughly
