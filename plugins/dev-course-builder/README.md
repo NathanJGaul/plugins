@@ -31,7 +31,7 @@ Copy to your project's `.claude-plugin/` directory.
 | `/create-exercise` | Create coding exercises | `/create-exercise cpp-fundamentals recursion` |
 | `/create-project` | Multi-session project | `/create-project cpp-fundamentals capstone` |
 | `/create-lab` | Hands-on lab session | `/create-lab cpp-fundamentals chapters 5-6` |
-| `/create-slides` | Lecture slides | `/create-slides cpp-fundamentals memory-management` |
+| `/create-slides` | Video presentation slides (Slidev) | `/create-slides cpp-fundamentals memory-management` |
 
 ### Content Review
 
@@ -94,6 +94,8 @@ The plugin provides specialized knowledge through skills:
 | `course-review` | Review frameworks and quality checklists |
 | `sandbox` | Docker-based code execution infrastructure |
 | `sandbox-templates` | Language-specific Dockerfile templates |
+| `slidev` | Slidev presentation syntax and features reference |
+| `video-scripts` | Video script writing techniques for presenter notes |
 | `courses/cpp-fundamentals` | C++ course configuration |
 | `courses/systems-programming` | Systems programming base profile |
 
@@ -101,10 +103,11 @@ The plugin provides specialized knowledge through skills:
 
 | Agent | Purpose |
 |-------|---------|
-| `course-architect` | Content creation - chapters, exercises, labs, quizzes, slides, projects |
+| `course-architect` | Content creation - chapters, exercises, labs, quizzes, projects |
 | `course-reviewer` | Content review - code correctness, pedagogy, consistency, quality |
+| `slides-architect` | Video presentations - Slidev slides with detailed presenter scripts |
 
-Both agents integrate with the Docker sandbox for code validation.
+The course-architect and course-reviewer agents integrate with the Docker sandbox for code validation.
 
 ## Code Sandbox
 
@@ -157,6 +160,99 @@ Before publishing course content:
 4. **Lint for consistency**: `/lint-code src/`
 5. **Check memory safety**: `/debug-code example.cpp sanitize`
 
+## Video Presentations (Slidev)
+
+The plugin includes a dedicated system for creating YouTube and online course video presentations using Slidev.
+
+### Features
+
+- **Video-Optimized**: 16:9 aspect ratio, readable text, smooth transitions
+- **Presenter Scripts**: Comprehensive notes with visual cues for recording
+- **Progressive Reveals**: Click-through code highlighting and animations
+- **Diagrams**: Mermaid flowcharts, sequence diagrams, class diagrams
+- **Single File Output**: One `.md` file per video presentation
+
+### Quick Start
+
+```bash
+# Create a video presentation from course content
+/create-slides cpp-fundamentals smart-pointers
+```
+
+The interactive workflow guides you through:
+1. Course selection
+2. Source content (chapter, lab, exercise, or new topic)
+3. Video length (5-7, 10-15, or 20-25 minutes)
+4. Video style (tutorial, explainer, code walkthrough, comparison, quick tips)
+
+### Slidev Features Used
+
+| Feature | Purpose |
+|---------|---------|
+| Layouts | `center`, `two-cols`, `section`, `fact`, `quote` |
+| Code Highlighting | Progressive reveals with `{1\|2-3\|all}` syntax |
+| Animations | `v-click`, `v-clicks` for progressive content |
+| Diagrams | Mermaid for flowcharts and architecture |
+| Styling | UnoCSS utilities for visual polish |
+
+### Presenter Notes Format
+
+Every slide includes comprehensive notes with visual cues:
+
+```markdown
+<!--
+[HOOK] Start with an engaging question
+
+Main points to cover:
+- First key concept
+- Build on previous understanding
+
+[click] Code appears - walk through each line
+[click] Next animation - explain the pattern
+
+[PAUSE] Give viewers time to absorb
+
+[TRANSITION] Lead into the next topic...
+-->
+```
+
+### Visual Cue Markers
+
+| Marker | Meaning |
+|--------|---------|
+| `[click]` | Trigger next animation |
+| `[SHOW CODE]` | Draw attention to code |
+| `[PAUSE]` | Pause for emphasis |
+| `[TRANSITION]` | Moving to next topic |
+| `[VISUAL CUE]` | Point to diagram/image |
+| `[QUESTION]` | Rhetorical question |
+
+### Video Structure
+
+Standard 10-15 minute presentation:
+
+| Section | Duration | Purpose |
+|---------|----------|---------|
+| Hook/Intro | 30-60s | Engage viewers |
+| Core Content | 8-12min | Main teaching |
+| Summary | 1-2min | Key takeaways |
+| Call to Action | 30s | Next steps |
+
+### Running Presentations
+
+```bash
+# Install Slidev (if needed)
+npm install -g @slidev/cli
+
+# Run presentation
+slidev smart-pointers-slides.md
+
+# Export to PDF
+slidev export smart-pointers-slides.md
+
+# Presenter mode (press 'p' during presentation)
+```
+
 ## Content Structure
 
 Generated content follows consistent templates:
@@ -200,7 +296,8 @@ dev-course-builder/
 │   └── plugin.json
 ├── agents/
 │   ├── course-architect.md      # Content creation agent
-│   └── course-reviewer.md       # Quality review agent
+│   ├── course-reviewer.md       # Quality review agent
+│   └── slides-architect.md      # Video presentation agent
 ├── commands/
 │   ├── create-course-profile.md
 │   ├── create-exercise.md
@@ -234,7 +331,11 @@ dev-course-builder/
 │   │   └── SKILL.md
 │   ├── sandbox/                  # Sandbox skills
 │   │   └── SKILL.md
-│   └── sandbox-templates/
+│   ├── sandbox-templates/
+│   │   └── SKILL.md
+│   ├── slidev/                   # Video presentation skills
+│   │   └── SKILL.md
+│   └── video-scripts/
 │       └── SKILL.md
 └── README.md
 ```
