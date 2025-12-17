@@ -11,7 +11,6 @@
       "name": "dev-course-builder",
       "source": "./plugins/dev-course-builder",
       "description": "Tools for creating educational content for programming and software development courses",
-      "version": "0.0.1",
       "author": {
         "name": "Nathan Gaul"
       },
